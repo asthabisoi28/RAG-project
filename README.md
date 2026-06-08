@@ -1,25 +1,127 @@
 # AI Chat with Document Search (RAG)
 
-A production-minded Retrieval Augmented Generation application built with FastAPI, FAISS, sentence-transformers, PyMuPDF, and React + Tailwind CSS.
+A full-stack Retrieval Augmented Generation application built with **FastAPI**, **FAISS**, **Sentence Transformers**, **PyMuPDF**, **Gemini/OpenAI**, and **React + Tailwind CSS**.
 
-The app lets users upload multiple PDF documents, indexes their content into a local FAISS vector store, performs semantic retrieval for each chat question, and generates grounded answers with source citations using OpenAI or Gemini.
+The app allows users to upload PDF documents, search them semantically, ask questions in a chat interface, and receive answers with source citations from the uploaded documents.
 
-## Architecture
+## Features
+
+- Upload one or more PDF documents
+- Extract text from PDFs using PyMuPDF
+- Split extracted text into meaningful chunks
+- Generate embeddings with Sentence Transformers
+- Store and search embeddings using FAISS
+- Ask questions about uploaded PDFs
+- Generate answers using Gemini or OpenAI
+- Show source citations with filename, page number, score, and retrieved text
+- Delete uploaded documents from the index
+- Persist document metadata and vector index locally
+- Responsive React + Tailwind UI
+- Chat history, loading states, and error handling
+
+## Tech Stack
+
+### Backend
+
+- Python
+- FastAPI
+- Uvicorn
+- Pydantic
+- PyMuPDF
+- Sentence Transformers
+- FAISS
+- NumPy
+- OpenAI API
+- Google Gemini API
+
+### Frontend
+
+- React
+- Vite
+- Tailwind CSS
+- Lucide React icons
+- Fetch API
+
+### Storage
+
+- Local PDF storage
+- Local FAISS index
+- JSON metadata for documents and chunks
+
+## Project Structure
 
 ```text
-frontend/ React + Tailwind
-   |
-   | REST JSON + multipart upload
-   v
-backend/ FastAPI
-   |
-   |-- document parsing: PyMuPDF
-   |-- chunking: token-aware recursive text windows
-   |-- embeddings: sentence-transformers
-   |-- retrieval: FAISS IndexFlatIP with normalized vectors
-   |-- generation: OpenAI or Gemini provider
-   |-- persistence: local JSON metadata + FAISS index
+.
+|-- backend
+|   |-- app
+|   |   |-- api
+|   |   |   `-- routes.py
+|   |   |-- core
+|   |   |   |-- config.py
+|   |   |   `-- exceptions.py
+|   |   |-- models
+|   |   |   `-- schemas.py
+|   |   |-- services
+|   |   |   |-- chunker.py
+|   |   |   |-- document_loader.py
+|   |   |   |-- embeddings.py
+|   |   |   |-- llm.py
+|   |   |   |-- rag.py
+|   |   |   `-- vector_store.py
+|   |   `-- main.py
+|   |-- requirements.txt
+|   `-- .env.example
+|-- frontend
+|   |-- src
+|   |   |-- api
+|   |   |   `-- client.js
+|   |   |-- components
+|   |   |   |-- ChatPanel.jsx
+|   |   |   |-- DocumentPanel.jsx
+|   |   |   `-- SourceList.jsx
+|   |   |-- App.jsx
+|   |   |-- main.jsx
+|   |   `-- styles.css
+|   |-- package.json
+|   |-- tailwind.config.js
+|   `-- vite.config.js
+|-- README.md
+`-- .gitignore
 ```
+
+## How It Works
+
+1. User uploads PDF files from the frontend.
+2. FastAPI validates the files and saves them locally.
+3. PyMuPDF extracts text page by page.
+4. The text is split into overlapping chunks.
+5. Sentence Transformers generate embeddings for each chunk.
+6. FAISS stores normalized embeddings for semantic search.
+7. When the user asks a question, the question is embedded and searched against FAISS.
+8. The most relevant chunks are sent to Gemini or OpenAI as context.
+9. The LLM generates an answer with citations.
+10. The frontend displays the answer and expandable source references.
+
+## Backend Setup
+
+Open a terminal:
+
+```powershell
+cd "C:\Users\asbi1\Documents\RAG project\backend"
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env
+```
+
+Edit `backend\.env`.
+
+For Gemini:
+
+```env
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
 
 ### Important Technical Decisions
 
@@ -30,44 +132,6 @@ backend/ FastAPI
 - **Modular services**: parsing, chunking, embeddings, vector storage, generation, and orchestration are separate modules for maintainability.
 - **Defensive validation**: file type, file size, empty PDFs, missing indexes, and LLM configuration errors are handled explicitly.
 
-## Folder Structure
-
-```text
-.
-├── backend
-│   ├── app
-│   │   ├── api
-│   │   │   └── routes.py
-│   │   ├── core
-│   │   │   ├── config.py
-│   │   │   └── exceptions.py
-│   │   ├── models
-│   │   │   └── schemas.py
-│   │   ├── services
-│   │   │   ├── chunker.py
-│   │   │   ├── document_loader.py
-│   │   │   ├── embeddings.py
-│   │   │   ├── llm.py
-│   │   │   ├── rag.py
-│   │   │   └── vector_store.py
-│   │   └── main.py
-│   ├── requirements.txt
-│   └── .env.example
-└── frontend
-    ├── src
-    │   ├── api
-    │   │   └── client.js
-    │   ├── components
-    │   │   ├── ChatPanel.jsx
-    │   │   ├── DocumentPanel.jsx
-    │   │   └── SourceList.jsx
-    │   ├── App.jsx
-    │   ├── main.jsx
-    │   └── styles.css
-    ├── package.json
-    ├── tailwind.config.js
-    └── vite.config.js
-```
 
 ## Backend Setup
 
@@ -79,16 +143,6 @@ pip install -r requirements.txt
 copy .env.example .env
 uvicorn app.main:app --reload --port 8000
 ```
-
-Set either OpenAI or Gemini credentials in `backend/.env`.
-
-```env
-LLM_PROVIDER=openai
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
-```
-
-or:
 
 ```env
 LLM_PROVIDER=gemini
