@@ -123,6 +123,7 @@ LLM_PROVIDER=gemini
 GEMINI_API_KEY=your_gemini_api_key
 GEMINI_MODEL=gemini-2.5-flash
 
+```
 ### Important Technical Decisions
 
 - **FAISS IndexFlatIP + normalized embeddings**: cosine similarity without a training step, simple and reliable for an internship-scale project.
@@ -157,7 +158,7 @@ cd frontend
 npm install
 copy .env.example .env
 npm run dev
-```
+
 
 In local development, the frontend calls `/api/*` and Vite proxies those requests to `http://localhost:8000`. For deployment, set `VITE_API_BASE_URL` to the backend URL.
 
