@@ -1,195 +1,321 @@
 # AI Chat with Document Search (RAG)
 
-A production-minded Retrieval Augmented Generation application built with FastAPI, FAISS, sentence-transformers, PyMuPDF, and React + Tailwind CSS.
+A full-stack Retrieval Augmented Generation application built with **FastAPI**, **FAISS**, **Sentence Transformers**, **PyMuPDF**, **Gemini/OpenAI**, and **React + Tailwind CSS**.
 
-The app lets users upload multiple PDF documents, indexes their content into a local FAISS vector store, performs semantic retrieval for each chat question, and generates grounded answers with source citations using OpenAI or Gemini.
+The app allows users to upload PDF documents, search them semantically, ask questions in a chat interface, and receive answers with source citations from the uploaded documents.
 
-## Architecture
+## Features
 
-```text
-frontend/ React + Tailwind
-   |
-   | REST JSON + multipart upload
-   v
-backend/ FastAPI
-   |
-   |-- document parsing: PyMuPDF
-   |-- chunking: token-aware recursive text windows
-   |-- embeddings: sentence-transformers
-   |-- retrieval: FAISS IndexFlatIP with normalized vectors
-   |-- generation: OpenAI or Gemini provider
-   |-- persistence: local JSON metadata + FAISS index
-```
+- Upload one or more PDF documents
+- Extract text from PDFs using PyMuPDF
+- Split extracted text into meaningful chunks
+- Generate embeddings with Sentence Transformers
+- Store and search embeddings using FAISS
+- Ask questions about uploaded PDFs
+- Generate answers using Gemini or OpenAI
+- Show source citations with filename, page number, score, and retrieved text
+- Delete uploaded documents from the index
+- Persist document metadata and vector index locally
+- Responsive React + Tailwind UI
+- Chat history, loading states, and error handling
 
-### Important Technical Decisions
+## Tech Stack
 
-- **FAISS IndexFlatIP + normalized embeddings**: cosine similarity without a training step, simple and reliable for an internship-scale project.
-- **Local persistence**: uploaded files, document metadata, chunks, and FAISS indexes survive restarts without adding database infrastructure.
-- **Provider abstraction for LLMs**: OpenAI and Gemini are isolated behind one interface, so the API layer does not know vendor details.
-- **Structured citations**: every answer returns source filename, page number, chunk id, and score for transparent grounding.
-- **Modular services**: parsing, chunking, embeddings, vector storage, generation, and orchestration are separate modules for maintainability.
-- **Defensive validation**: file type, file size, empty PDFs, missing indexes, and LLM configuration errors are handled explicitly.
+### Backend
 
-## Folder Structure
+- Python
+- FastAPI
+- Uvicorn
+- Pydantic
+- PyMuPDF
+- Sentence Transformers
+- FAISS
+- NumPy
+- OpenAI API
+- Google Gemini API
+
+### Frontend
+
+- React
+- Vite
+- Tailwind CSS
+- Lucide React icons
+- Fetch API
+
+### Storage
+
+- Local PDF storage
+- Local FAISS index
+- JSON metadata for documents and chunks
+
+## Project Structure
 
 ```text
 .
-├── backend
-│   ├── app
-│   │   ├── api
-│   │   │   └── routes.py
-│   │   ├── core
-│   │   │   ├── config.py
-│   │   │   └── exceptions.py
-│   │   ├── models
-│   │   │   └── schemas.py
-│   │   ├── services
-│   │   │   ├── chunker.py
-│   │   │   ├── document_loader.py
-│   │   │   ├── embeddings.py
-│   │   │   ├── llm.py
-│   │   │   ├── rag.py
-│   │   │   └── vector_store.py
-│   │   └── main.py
-│   ├── requirements.txt
-│   └── .env.example
-└── frontend
-    ├── src
-    │   ├── api
-    │   │   └── client.js
-    │   ├── components
-    │   │   ├── ChatPanel.jsx
-    │   │   ├── DocumentPanel.jsx
-    │   │   └── SourceList.jsx
-    │   ├── App.jsx
-    │   ├── main.jsx
-    │   └── styles.css
-    ├── package.json
-    ├── tailwind.config.js
-    └── vite.config.js
+|-- backend
+|   |-- app
+|   |   |-- api
+|   |   |   `-- routes.py
+|   |   |-- core
+|   |   |   |-- config.py
+|   |   |   `-- exceptions.py
+|   |   |-- models
+|   |   |   `-- schemas.py
+|   |   |-- services
+|   |   |   |-- chunker.py
+|   |   |   |-- document_loader.py
+|   |   |   |-- embeddings.py
+|   |   |   |-- llm.py
+|   |   |   |-- rag.py
+|   |   |   `-- vector_store.py
+|   |   `-- main.py
+|   |-- requirements.txt
+|   `-- .env.example
+|-- frontend
+|   |-- src
+|   |   |-- api
+|   |   |   `-- client.js
+|   |   |-- components
+|   |   |   |-- ChatPanel.jsx
+|   |   |   |-- DocumentPanel.jsx
+|   |   |   `-- SourceList.jsx
+|   |   |-- App.jsx
+|   |   |-- main.jsx
+|   |   `-- styles.css
+|   |-- package.json
+|   |-- tailwind.config.js
+|   `-- vite.config.js
+|-- README.md
+`-- .gitignore
 ```
+
+## How It Works
+
+1. User uploads PDF files from the frontend.
+2. FastAPI validates the files and saves them locally.
+3. PyMuPDF extracts text page by page.
+4. The text is split into overlapping chunks.
+5. Sentence Transformers generate embeddings for each chunk.
+6. FAISS stores normalized embeddings for semantic search.
+7. When the user asks a question, the question is embedded and searched against FAISS.
+8. The most relevant chunks are sent to Gemini or OpenAI as context.
+9. The LLM generates an answer with citations.
+10. The frontend displays the answer and expandable source references.
 
 ## Backend Setup
 
-```bash
-cd backend
+Open a terminal:
+
+```powershell
+cd "C:\Users\asbi1\Documents\RAG project\backend"
 python -m venv .venv
-.venv\Scripts\activate
+.\.venv\Scripts\activate
 pip install -r requirements.txt
 copy .env.example .env
-uvicorn app.main:app --reload --port 8000
 ```
 
-Set either OpenAI or Gemini credentials in `backend/.env`.
+Edit `backend\.env`.
 
-```env
-LLM_PROVIDER=openai
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
-```
-
-or:
+For Gemini:
 
 ```env
 LLM_PROVIDER=gemini
-GEMINI_API_KEY=...
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+For OpenAI:
+
+```env
+LLM_PROVIDER=openai
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4o-mini
+```
+
+Start the backend:
+
+```powershell
+uvicorn app.main:app --reload --port 8000
+```
+
+Backend API:
+
+```text
+http://127.0.0.1:8000
+```
+
+Swagger docs:
+
+```text
+http://127.0.0.1:8000/docs
 ```
 
 ## Frontend Setup
 
-```bash
-cd frontend
+Open a second terminal:
+
+```powershell
+cd "C:\Users\asbi1\Documents\RAG project\frontend"
 npm install
-copy .env.example .env
 npm run dev
 ```
 
-In local development, the frontend calls `/api/*` and Vite proxies those requests to `http://localhost:8000`. For deployment, set `VITE_API_BASE_URL` to the backend URL.
+Frontend app:
 
-## REST API
+```text
+http://127.0.0.1:5173
+```
 
-### Health
+In local development, Vite proxies `/api/*` requests to `http://127.0.0.1:8000`.
 
-`GET /api/health`
+## API Endpoints
 
-Returns service status and current index statistics.
+### Health Check
 
-### Upload PDFs
+```http
+GET /api/health
+```
 
-`POST /api/documents/upload`
+Returns backend status and index statistics.
 
-Multipart field: `files`
+### Upload Documents
 
-Accepts one or more PDF files and returns indexed document metadata.
+```http
+POST /api/documents/upload
+```
+
+Form field:
+
+```text
+files
+```
+
+Supports multiple PDF uploads.
 
 ### List Documents
 
-`GET /api/documents`
+```http
+GET /api/documents
+```
 
-Returns documents currently known to the local store.
+Returns all indexed documents.
+
+### Delete Document
+
+```http
+DELETE /api/documents/{document_id}
+```
+
+Deletes the document metadata, chunks, uploaded PDF file, and rebuilds the FAISS index.
 
 ### Chat
 
-`POST /api/chat`
+```http
+POST /api/chat
+```
+
+Request:
 
 ```json
 {
-  "message": "What are the key findings?",
+  "message": "Summarize the uploaded PDFs",
   "top_k": 5,
-  "history": [
-    { "role": "user", "content": "Summarize the document" },
-    { "role": "assistant", "content": "..." }
-  ]
+  "history": []
 }
 ```
 
-Returns:
+Response:
 
 ```json
 {
-  "answer": "...",
+  "answer": "The documents describe...",
   "sources": [
     {
-      "document_id": "...",
-      "filename": "paper.pdf",
-      "page": 3,
-      "chunk_id": "...",
-      "score": 0.81,
-      "text": "..."
+      "document_id": "document-id",
+      "filename": "example.pdf",
+      "page": 1,
+      "chunk_id": "chunk-id",
+      "score": 0.82,
+      "text": "Retrieved source text..."
     }
   ]
 }
 ```
 
-## Deployment
+## Environment Variables
+
+Backend variables are stored in:
+
+```text
+backend/.env
+```
+
+Important variables:
+
+```env
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-2.5-flash
+
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-4o-mini
+
+EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+CHUNK_SIZE=900
+CHUNK_OVERLAP=180
+TOP_K=5
+MAX_UPLOAD_SIZE_MB=25
+```
+
+## Common Issues
+
+### Connection refused on port 8000
+
+The backend is not running. Start it with:
+
+```powershell
+cd "C:\Users\asbi1\Documents\RAG project\backend"
+.\.venv\Scripts\activate
+uvicorn app.main:app --reload --port 8000
+```
+
+### OpenAI or Gemini quota error
+
+The API key is valid, but the provider account/project has no available quota. Add billing/quota, use another key, or switch providers in `backend/.env`.
+
+### Old files appear in citations
+
+The app persists uploaded documents in `backend/storage`. Delete unwanted files from the UI using the trash button, or clear the storage folder during development.
+
+## Deployment Notes
 
 ### Backend
 
-1. Create a production `.env`.
-2. Install dependencies in a virtual environment.
-3. Run with Gunicorn/Uvicorn workers:
+- Use a production `.env`.
+- Run with Uvicorn/Gunicorn.
+- Persist `backend/storage`.
+- Put Nginx or a cloud load balancer in front.
+- Configure upload size limits.
+
+Example:
 
 ```bash
 gunicorn app.main:app -k uvicorn.workers.UvicornWorker -w 2 -b 0.0.0.0:8000
 ```
 
-4. Mount `backend/storage` as persistent disk storage.
-5. Put Nginx or a cloud load balancer in front for TLS and upload limits.
-
 ### Frontend
+
+Build the frontend:
 
 ```bash
 cd frontend
 npm run build
 ```
 
-Serve `frontend/dist` from Vercel, Netlify, Nginx, or any static host. Set `VITE_API_BASE_URL` to the deployed backend URL.
+Deploy `frontend/dist` to Vercel, Netlify, Nginx, or any static hosting provider.
 
-## Production Notes
+For deployment, set:
 
-- Replace local JSON metadata with Postgres for multi-user production.
-- Replace local file storage with S3/GCS/Azure Blob for horizontal scaling.
-- Use background workers for large PDF ingestion.
-- Add authentication and per-user/tenant indexes before exposing publicly.
-- Add observability for upload latency, retrieval score distributions, and LLM failures.
+```env
+VITE_API_BASE_URL=https://your-backend-domain.com
+```
