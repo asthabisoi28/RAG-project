@@ -289,6 +289,28 @@ The app persists uploaded documents in `backend/storage`. Delete unwanted files 
 
 ## Deployment Notes
 
+### Docker Compose
+
+Create `backend/.env` first, then run both services:
+
+```bash
+docker compose up --build
+```
+
+Frontend:
+
+```text
+http://localhost:3000
+```
+
+Backend:
+
+```text
+http://localhost:8000
+```
+
+The backend stores uploaded PDFs, metadata, and FAISS files in the `backend_storage` Docker volume.
+
 ### Backend
 
 - Use a production `.env`.
