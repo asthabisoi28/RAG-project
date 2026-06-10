@@ -125,61 +125,6 @@ GEMINI_MODEL=gemini-2.5-flash
 
 ```
 
-
-```text
-.
-|-- backend
-|   |-- app
-|   |   |-- api
-|   |   |   `-- routes.py
-|   |   |-- core
-|   |   |   |-- config.py
-|   |   |   `-- exceptions.py
-|   |   |-- models
-|   |   |   `-- schemas.py
-|   |   |-- services
-|   |   |   |-- chunker.py
-|   |   |   |-- document_loader.py
-|   |   |   |-- embeddings.py
-|   |   |   |-- llm.py
-|   |   |   |-- rag.py
-|   |   |   `-- vector_store.py
-|   |   `-- main.py
-|   |-- requirements.txt
-|   `-- .env.example
-|-- frontend
-|   |-- src
-|   |   |-- api
-|   |   |   `-- client.js
-|   |   |-- components
-|   |   |   |-- ChatPanel.jsx
-|   |   |   |-- DocumentPanel.jsx
-|   |   |   `-- SourceList.jsx
-|   |   |-- App.jsx
-|   |   |-- main.jsx
-|   |   `-- styles.css
-|   |-- package.json
-|   |-- tailwind.config.js
-|   `-- vite.config.js
-|-- README.md
-`-- .gitignore
-```
-=======
->>>>>>> d18111cf4a28162bc0f08a7138bb4cb0d74e1e4e
-
-## How It Works
-
-1. User uploads PDF files from the frontend.
-2. FastAPI validates the files and saves them locally.
-3. PyMuPDF extracts text page by page.
-4. The text is split into overlapping chunks.
-5. Sentence Transformers generate embeddings for each chunk.
-6. FAISS stores normalized embeddings for semantic search.
-7. When the user asks a question, the question is embedded and searched against FAISS.
-8. The most relevant chunks are sent to Gemini or OpenAI as context.
-9. The LLM generates an answer with citations.
-10. The frontend displays the answer and expandable source references.
-
 ## Backend Setup
 
 Open a terminal:
@@ -189,29 +134,8 @@ cd "C:\Users\asbi1\Documents\RAG project\backend"
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
-copy .env.example .env
 ```
 
-<<<<<<< HEAD
-Edit `backend\.env`.
-
-For Gemini:
-
-=======
->>>>>>> d18111cf4a28162bc0f08a7138bb4cb0d74e1e4e
-```env
-LLM_PROVIDER=gemini
-GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-2.5-flash
-```
-
-For OpenAI:
-
-```env
-LLM_PROVIDER=openai
-OPENAI_API_KEY=your_openai_api_key
-OPENAI_MODEL=gpt-4o-mini
-```
 
 Start the backend:
 
