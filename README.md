@@ -5,7 +5,6 @@ A full-stack Retrieval Augmented Generation application built with **FastAPI**, 
 The app allows users to upload PDF documents, search them semantically, ask questions in a chat interface, and receive answers with source citations from the uploaded documents.
 
 ## Features
-<<<<<<< HEAD
 
 - Upload one or more PDF documents
 - Extract text from PDFs using PyMuPDF
