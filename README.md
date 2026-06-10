@@ -20,22 +20,6 @@ The app allows users to upload PDF documents, search them semantically, ask ques
 - Chat history, loading states, and error handling
 
 ## Tech Stack
-=======
-
-- Upload one or more PDF documents
-- Extract text from PDFs using PyMuPDF
-- Split extracted text into meaningful chunks
-- Generate embeddings with Sentence Transformers
-- Store and search embeddings using FAISS
-- Ask questions about uploaded PDFs
-- Generate answers using Gemini or OpenAI
-- Show source citations with filename, page number, score, and retrieved text
-- Delete uploaded documents from the index
-- Persist document metadata and vector index locally
-- Responsive React + Tailwind UI
-- Chat history, loading states, and error handling
-
-## Tech Stack
 
 ### Backend
 
@@ -140,38 +124,7 @@ GEMINI_API_KEY=your_gemini_api_key
 GEMINI_MODEL=gemini-2.5-flash
 
 ```
-### Important Technical Decisions
->>>>>>> d18111cf4a28162bc0f08a7138bb4cb0d74e1e4e
 
-### Backend
-
-<<<<<<< HEAD
-- Python
-- FastAPI
-- Uvicorn
-- Pydantic
-- PyMuPDF
-- Sentence Transformers
-- FAISS
-- NumPy
-- OpenAI API
-- Google Gemini API
-
-### Frontend
-
-- React
-- Vite
-- Tailwind CSS
-- Lucide React icons
-- Fetch API
-
-### Storage
-
-- Local PDF storage
-- Local FAISS index
-- JSON metadata for documents and chunks
-
-## Project Structure
 
 ```text
 .
